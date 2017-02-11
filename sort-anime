@@ -1,0 +1,90 @@
+#!/usr/bin/python3
+
+import click
+import glob
+import itertools
+import os
+import pprint
+import regex
+import sys
+
+anime_regex = regex.compile(r"""
+^
+\[ (?P<group> [a-zA-Z]+) \]
+\s
+(?P<title> .+)
+\s-\s
+(?P<episode> [0-9]+)
+\s
+(?: \[ (?P<quality> [0-9p]+) \] )?
+(?: \[ (?P<crc32> [0-9a-fA-F]+) \] )?
+\.
+(?P<extension> [a-zA-Z0-9]+)
+$
+""", regex.VERBOSE)
+
+
+class InvalidFileName(Exception):
+    pass
+
+def get_title(fname):
+    match = anime_regex.match(fname)
+
+    if match is None:
+        raise InvalidFileName("Couldn't detect title of {}".format(fname))
+
+    return anime_regex.match(fname).group('title')
+
+def do_rename(old, new, dry_run):
+    if dry_run:
+        print("Would rename {} -> {}".format(old, new))
+
+    else:
+        print("Renaming {} -> {}".format(old, new))
+        os.rename(old, new)
+
+def do_mkdirs(directory, dry_run, created_directories):
+    if directory in created_directories:
+        return
+
+    created_directories.add(directory)
+
+    if os.path.exists(directory):
+        return
+
+    if dry_run:
+        print("Would mkdir {}".format(directory))
+
+    else:
+        print("Creating {}".format(directory))
+        os.makedirs(directory)
+
+
+@click.command()
+@click.option('-n', '--dry-run',
+              is_flag=True,
+              default=False, show_default=True,
+              help="Dry-run")
+@click.option('-p', '--prefix',
+              default='',
+              help="Path prefix")
+@click.option('-c', '--create-dir', is_flag=True, default=False,
+              help='Create directory')
+@click.argument('files', required=True, nargs=-1)
+def main(dry_run, prefix, create_dir, files):
+    created = set()
+    for fname in files:
+        try:
+            newname = os.path.join(prefix, get_title(fname), fname)
+            destdir = os.path.dirname(newname)
+
+            if create_dir:
+                do_mkdirs(destdir, dry_run, created)
+
+            do_rename(fname, newname, dry_run)
+
+        except Exception as e:
+            print("Error processing {}: {}".format(fname, e))
+
+if __name__ == '__main__':
+    main()
