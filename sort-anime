@@ -10,7 +10,7 @@ anime_regex = re.compile(r"""
 \s
 (?P<title> .+)
 \s-\s
-(?P<episode> [0-9]+)
+(?P<episode> [0-9]+(?:v[0-9]+)?)
 \s
 (?: \[ (?P<quality> [0-9p]+) \] )?
 (?: \[ (?P<crc32> [0-9a-fA-F]+) \] )?
