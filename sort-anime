@@ -2,8 +2,9 @@
 
 import click
 import os
+import re
 
-anime_regex = regex.compile(r"""
+anime_regex = re.compile(r"""
 ^
 \[ (?P<group> [a-zA-Z]+) \]
 \s
@@ -16,7 +17,7 @@ anime_regex = regex.compile(r"""
 \.
 (?P<extension> [a-zA-Z0-9]+)
 $
-""", regex.VERBOSE)
+""", re.VERBOSE)
 
 
 class InvalidFileName(Exception):
