@@ -6,14 +6,15 @@ import re
 
 anime_regex = re.compile(r"""
 ^
-\[ (?P<group> [a-zA-Z]+) \]
+\[ (?P<group> [a-zA-Z-]+) \]
 \s
 (?P<title> .+)
 \s-\s
 (?P<episode> [0-9]+(?:v[0-9]+)?)
-\s
-(?: \[ (?P<quality> [0-9p]+) \] )?
-(?: \[ (?P<crc32> [0-9a-fA-F]+) \] )?
+(?: \s
+    (?: \[ (?P<quality> [0-9p]+) \] | \([a-zA-Z-\s0-9]+\) )?
+    (?: \[ (?P<crc32> [0-9a-fA-F]+) \] )?
+)?
 \.
 (?P<extension> [a-zA-Z0-9]+)
 $
