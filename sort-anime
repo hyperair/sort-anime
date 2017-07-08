@@ -25,6 +25,7 @@ class InvalidFileName(Exception):
     pass
 
 def get_title(fname):
+    fname = fname.replace('_', ' ')
     match = anime_regex.match(fname)
 
     if match is None:
